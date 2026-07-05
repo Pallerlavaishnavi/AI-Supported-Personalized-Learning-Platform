@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 30px;
+        }
+        .card {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        h2 { text-align: center; margin-top: 0; }
+        label { font-weight: 600; }
+        input {
+            width: 100%;
+            padding: 8px 10px;
+            margin: 6px 0 14px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 9px 15px;
+            border-radius: 5px;
+            border: none;
+            background: #006bb3;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 4px;
+            width: 100%;
+        }
+        button:hover { background: #004d80; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>Student Login</h2>
+
+    <label>Username</label>
+    <input type="text" id="username" placeholder="Enter username">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Enter password">
+    <button onclick="loginStudent()">Login & View Learning Path</button>
+</div>
+
+<script>
+function loginStudent() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    if (!username || !password) {
+        alert("Enter username and password");
+        return;
+    }
+
+    // verify login using the same API you already have
+    fetch("http://127.0.0.1:3000/studentLogin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+    })
+    .then(res => res.json())
+    .then(r => {
+        if (!r.success) {
+            alert(r.msg);
+            return;
+        }
+        // redirect to second page with username in URL
+        window.location.href = `student_path.html?user=${encodeURIComponent(username)}`;
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Error connecting to server. Is npm start running?");
+    });
+}
+</script>
+</body>
+</html>

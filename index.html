@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Learning Platform – Student Registration</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4f8cff, #6ee7b7);
+            margin: 0;
+            padding: 0;
+        }
+        .wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            width: 420px;
+            background: #ffffff;
+            padding: 25px 30px 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        p.subtitle {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #555;
+        }
+        label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        input, select {
+            width: 100%;
+            padding: 9px 10px;
+            margin-top: 6px;
+            margin-bottom: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            font-size: 14px;
+        }
+        input:focus, select:focus {
+            border-color: #4f8cff;
+            box-shadow: 0 0 0 2px rgba(79,140,255,0.2);
+        }
+        .two-col {
+            display: flex;
+            gap: 10px;
+        }
+        .two-col > div {
+            flex: 1;
+        }
+        button {
+            width: 100%;
+            background: #006bb3;
+            padding: 11px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 5px;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #004d80;
+        }
+        .info-box {
+            background: #f3f7ff;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #444;
+        }
+        .student-link {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        .student-link a {
+            color: #004d80;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+<div class="wrapper">
+    <div class="container">
+        <h2>Student Registration</h2>
+        <p class="subtitle">AI‑Supported Personalized Learning Platform</p>
+
+        <div class="info-box">
+            Fill your details and weak subject. Admin will assign a video / PDF learning path.
+        </div>
+
+        <label>Username</label>
+        <input type="text" id="username" placeholder="Enter Username">
+
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Enter Password">
+
+        <div class="two-col">
+            <div>
+                <label>Age</label>
+                <input type="number" id="age" placeholder="Age">
+            </div>
+            <div>
+                <label>Phone</label>
+                <input type="text" id="phone" placeholder="10‑digit phone number">
+            </div>
+        </div>
+
+        <label>Email</label>
+        <input type="email" id="email" placeholder="Enter Email">
+
+        <label>Currently Studying</label>
+        <input type="text" id="studying" placeholder="Eg: B.E CSE – 3rd Year">
+
+        <label>What is your Weak Subject?</label>
+        <select id="weakness">
+            <option value="" selected disabled>Select Weakness</option>
+            <option value="Mathematics">Mathematics</option>
+            <option value="Data Structures">Data Structures</option>
+            <option value="DBMS">DBMS</option>
+            <option value="Computer Networks">Computer Networks</option>
+            <option value="Machine Learning">Machine Learning</option>
+        </select>
+
+        <button onclick="saveData()">Register</button>
+
+        <p class="student-link">
+            Already registered? <a href="student.html">Go to Student Dashboard</a>
+        </p>
+    </div>
+</div>
+
+<script>
+function saveData() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const age      = document.getElementById("age").value.trim();
+    const phone    = document.getElementById("phone").value.trim();
+    const email    = document.getElementById("email").value.trim();
+    const studying = document.getElementById("studying").value.trim();
+    const weakness = document.getElementById("weakness").value;
+
+    if (!username || !password || !email || !weakness || !age || !phone || !studying) {
+        alert("⚠ Please fill all fields!");
+        return;
+    }
+
+    fetch("http://127.0.0.1:3000/register", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ username, password, email, weakness, age, phone, studying })
+    })
+    .then(async res => {
+        let response = await res.json();
+        if (response.success) {
+            alert("✔ Student Registered Successfully!");
+
+            document.getElementById("username").value  = "";
+            document.getElementById("password").value  = "";
+            document.getElementById("age").value       = "";
+            document.getElementById("phone").value     = "";
+            document.getElementById("email").value     = "";
+            document.getElementById("studying").value  = "";
+            document.getElementById("weakness").value  = "";
+        } else {
+            alert("❌ Error: " + response.msg);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("❌ Backend not found — Please start Node server using 'npm start'");
+    });
+}
+</script>
+
+</body>
+</html>

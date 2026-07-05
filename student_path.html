@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Learning Path</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #4f8cff, #6ee7b7);
+            margin: 0;
+            padding: 40px 10px;
+        }
+        .card {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 25px 30px 30px;
+            border-radius: 16px;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+        }
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 6px;
+            font-size: 26px;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 18px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 30px;
+            margin-bottom: 14px;
+        }
+        .info-row { font-size: 14px; }
+        .label { font-weight: 600; color: #333; }
+        .value { color: #444; }
+
+        .section-title {
+            margin-top: 18px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            color: #222;
+        }
+        .section-desc {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            background: #e1f0ff;
+            color: #0051a8;
+            margin-left: 6px;
+        }
+
+        a.btn-link {
+            color: #006bb3;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        a.btn-link:hover { text-decoration: underline; }
+
+        button {
+            padding: 9px 18px;
+            border-radius: 8px;
+            border: none;
+            background: #006bb3;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 6px;
+            margin-top: 6px;
+            font-size: 14px;
+        }
+        button:hover { background: #004d80; }
+
+        .question {
+            margin-bottom: 12px;
+            padding: 12px 12px 10px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        .question strong { font-size: 14px; }
+
+        /* two-column option layout */
+        .options-grid{
+            display:grid;
+            grid-template-columns:auto 1fr;
+            column-gap:8px;
+            row-gap:6px;
+            align-items:center;
+            margin-top:8px;
+        }
+        .option-radio{
+            display:flex;
+            justify-content:center;
+        }
+        .option-text{
+            font-size:13px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 8px 10px;
+            margin: 4px 0 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4f8cff;
+            box-shadow: 0 0 0 2px rgba(79,140,255,0.25);
+        }
+        textarea { resize: vertical; min-height: 70px; }
+
+        .score-box {
+            padding: 10px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>Student Learning Path & Assessment</h2>
+    <div class="subtitle">AI‑Supported Personalized Learning Platform</div>
+
+    <div id="mainContent" style="margin-top:10px;">
+        <div class="section-title">
+            Assigned Learning Path <span class="pill" id="statusPill">Active</span>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-row"><span class="label">Username:</span> <span class="value" id="sUser"></span></div>
+            <div class="info-row"><span class="label">Email:</span> <span class="value" id="sEmail"></span></div>
+            <div class="info-row"><span class="label">Weak Subject:</span> <span class="value" id="sWeak"></span></div>
+            <div class="info-row"><span class="label">Completed:</span> <span class="value" id="sCompleted"></span></div>
+        </div>
+
+        <div class="info-row">
+            <span class="label">Video:</span>
+            <span class="value" id="sVideo"></span>
+        </div>
+        <div class="info-row">
+            <span class="label">PDF:</span>
+            <span class="value" id="sPdf"></span>
+        </div>
+
+        <button id="completeBtn" onclick="markCompleted()">✅ I have completed my learning path</button>
+
+        <!-- ASSESSMENT FLOW -->
+        <div id="testSection" style="display:none;">
+            <!-- STEP 1: REFLECTION QUESTIONS -->
+            <div class="section-title">Improvement Questionnaire</div>
+            <div class="section-desc">
+                Answer these short questions to reflect on what you learned in this topic.
+            </div>
+
+            <div id="questionsContainer"></div>
+
+            <button onclick="submitReflection()">Save Answers</button>
+
+            <!-- STEP 2: CHOICE YES/NO FOR TEST -->
+            <div id="testChoiceSection" style="display:none; margin-top:15px;">
+                <div class="section-title">Do you want to take a test now?</div>
+                <div class="section-desc">
+                    The test will have 10 MCQ questions based on your weak subject.
+                </div>
+                <button onclick="startTest()">Yes, take test</button>
+                <button onclick="skipTest()">No, maybe later</button>
+            </div>
+
+            <!-- STEP 3: MCQ TEST -->
+            <div id="mcqTestSection" style="display:none; margin-top:15px;">
+                <div class="section-title">Subject Test</div>
+                <div class="section-desc">
+                    Answer the following questions and then submit your test.
+                </div>
+
+                <div id="mcqContainer"></div>
+
+                <button onclick="submitMcqTest()">Submit Test</button>
+
+                <!-- SCORE + FEEDBACK -->
+                <div id="testResultsSection" style="display:none; margin-top:15px;">
+                    <div class="score-box">
+                        <span class="label">Your Test Score:</span>
+                        <span id="testScoreText"></span>
+                    </div>
+
+                    <label>Improvement status after test</label>
+                    <select id="improvement">
+                        <option value="Improved">Improved</option>
+                        <option value="No change">No change</option>
+                        <option value="Got worse">Got worse</option>
+                    </select>
+
+                    <label>Your Feedback</label>
+                    <textarea id="feedback" rows="3"
+                              placeholder="Write what helped you and what is still difficult..."></textarea>
+
+                    <button onclick="submitFinalFeedback()">Submit Score & Feedback</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ---------- URL USER ----------
+function getUserFromQuery() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("user");
+}
+
+let currentUser = getUserFromQuery();
+let currentWeakness = null;
+
+// ---------- REFLECTION TEMPLATES ----------
+const improvementTemplates = [
+  topic => ({
+    q: `After completing the learning path on ${topic}, how confident do you feel now?`,
+    opts: ["Very confident", "Somewhat confident", "A little confident", "Still not confident"]
+  }),
+  topic => ({
+    q: `Can you now solve at least one basic problem in ${topic} without help?`,
+    opts: ["Yes, easily", "Yes, but slowly", "Only with some help", "No, I still cannot"]
+  }),
+  topic => ({
+    q: `What is still most difficult for you in ${topic}?`,
+    opts: ["Understanding concepts", "Remembering formulas/steps", "Applying to problems", "Everything is clear now"]
+  }),
+  topic => ({
+    q: `How useful was the learning path (video/PDF) for ${topic}?`,
+    opts: ["Very useful", "Useful", "Little useful", "Not useful"]
+  }),
+  topic => ({
+    q: `How interested are you to practice more on ${topic}?`,
+    opts: ["Very interested", "Interested", "Not much interested", "No interest"]
+  })
+];
+
+// ---------- QUESTION BANKS BY SUBJECT ----------
+// Mathematics bank (existing 20 questions)
+const mathBank = [
+  { q: "1. What is the distance between the points –3 and 5 on a number line?",
+    opts:["5","8","2","3"], correct:1 },
+  { q: "2. Which of the following is a basic undefined term in geometry?",
+    opts:["Square","Point","Angle","Ray"], correct:1 },
+  { q: "3. A midpoint divides a segment into:",
+    opts:["Two equal parts","Three equal parts","Unequal parts","Four equal parts"], correct:0 },
+  { q: "4. The distance between two identical points is:",
+    opts:["Zero","One","Negative","Undefined"], correct:0 },
+  { q: "5. If AB = 8 cm and M is the midpoint, what is AM?",
+    opts:["2 cm","4 cm","8 cm","6 cm"], correct:1 },
+  { q: "6. Corresponding angles are formed when:",
+    opts:[
+      "Two circles meet",
+      "A transversal cuts parallel lines",
+      "A point divides a line",
+      "Two triangles are congruent"
+    ], correct:1 },
+  { q: "7. How many angles are formed when a transversal intersects two lines?",
+    opts:["8","6","4","2"], correct:0 },
+  { q: "8. If A – B – C, d(A,B)=7, d(B,C)=5. Find d(A,C).",
+    opts:["12","2","35","6"], correct:0 },
+  { q: "9. “If lines are parallel, corresponding angles are equal.” The converse is:",
+    opts:[
+      "If corresponding angles are equal, lines are parallel",
+      "If vertical angles are equal, lines are parallel",
+      "If two lines intersect, angles are equal",
+      "If lines are perpendicular, angles are equal"
+    ], correct:0 },
+  { q: "10. In ΔABC, ∠A=70°, ∠B=50°. Find ∠C.",
+    opts:["60°","70°","80°","50°"], correct:2 },
+  { q: "11. In a triangle, if two sides are equal, then:",
+    opts:[
+      "Opposite angles are unequal",
+      "Opposite angles are equal",
+      "Triangle is right-angled",
+      "Triangle is scalene"
+    ], correct:1 },
+  { q: "12. Interior angles test for parallel lines states:",
+    opts:[
+      "Exterior angles must be equal",
+      "Interior angles must be supplementary",
+      "Two angles must be right angles",
+      "Interior angles must be acute"
+    ], correct:1 },
+  { q: "13. In ΔPQR, ∠PQR=40°, ∠PRQ=60°. Find ∠PRS (exterior).",
+    opts:["20°","100°","40°","60°"], correct:1 },
+  { q: "14. Which of the following is a triangle congruence test?",
+    opts:["AAA","SAS","SSA","AAS"], correct:1 },
+  { q: "15. An exterior angle of a triangle is 120°. One interior remote angle = 50°. The other remote interior angle is:",
+    opts:["60°","70°","50°","40°"], correct:1 },
+  { q: "16. If alternate angles are 65°, then corresponding angles measure:",
+    opts:["115°","65°","45°","35°"], correct:1 },
+  { q: "17. If a line is perpendicular to two lines in a plane, then the two lines are:",
+    opts:["Intersecting","Parallel","Perpendicular","Skew"], correct:1 },
+  { q: "18. In ΔABC, AB = AC. The bisector of ∠A meets BC at D. Then BD =",
+    opts:["DC","AB","AC","AD"], correct:0 },
+  { q: "19. If two triangles have two equal angles and one equal included side, they are congruent by:",
+    opts:["ASA test","SSS test","RHS test","AAA test"], correct:0 },
+  { q: "20. In ΔABC, AD is angle bisector. BD = 6, DC = 9, AB = 10. What is AC?",
+    opts:["12","15","20","10"], correct:1 }
+];
+
+//CN bank (20 questions)
+const cnBank = [
+  { q:"What is a computer network?",
+    opts:["A single computer system","Interconnection of multiple computers","A software application"],
+    correct:1 },
+
+  { q:"Which device is used to connect multiple networks together?",
+    opts:["Hub","Switch","Router"],
+    correct:2 },
+
+  { q:"Which protocol is used to send emails?",
+    opts:["FTP","SMTP","HTTP"],
+    correct:1 },
+
+  { q:"Which layer of the OSI model is responsible for end-to-end delivery?",
+    opts:["Network layer","Transport layer","Session layer"],
+    correct:1 },
+
+  { q:"What does LAN stand for?",
+    opts:["Local Area Network","Large Area Network","Logical Area Network"],
+    correct:0 },
+
+  { q:"Which topology uses a central device?",
+    opts:["Ring","Bus","Star"],
+    correct:2 },
+
+  { q:"Which protocol is used to transfer files over the Internet?",
+    opts:["FTP","SMTP","SNMP"],
+    correct:0 },
+
+  { q:"Which OSI layer is responsible for error detection and correction?",
+    opts:["Data Link layer","Physical layer","Application layer"],
+    correct:0 },
+
+  { q:"What is the main function of the Network layer?",
+    opts:["Routing","Encryption","Error correction"],
+    correct:0 },
+
+  { q:"Which addressing is used at the Network layer?",
+    opts:["MAC address","IP address","Port number"],
+    correct:1 },
+
+  { q:"What is the default port number of HTTP?",
+    opts:["21","23","80"],
+    correct:2 },
+
+  { q:"Which protocol is connection-oriented?",
+    opts:["UDP","TCP","IP"],
+    correct:1 },
+
+  { q:"Which algorithm is used in congestion control?",
+    opts:["Stop and Wait","Leaky Bucket","CRC"],
+    correct:1 },
+
+  { q:"Which device operates at the Data Link layer?",
+    opts:["Router","Switch","Gateway"],
+    correct:1 },
+
+  { q:"Which type of transmission sends data in both directions at the same time?",
+    opts:["Simplex","Half-duplex","Full-duplex"],
+    correct:2 },
+
+  { q:"What is the main function of DNS?",
+    opts:["Encrypt data","Translate domain names to IP addresses","Route packets"],
+    correct:1 },
+
+  { q:"Which protocol is used for secure communication over a network?",
+    opts:["HTTP","FTP","HTTPS"],
+    correct:2 },
+
+  { q:"Which layer is responsible for data formatting and encryption?",
+    opts:["Presentation layer","Application layer","Session layer"],
+    correct:0 },
+
+  { q:"Which multiplexing technique divides bandwidth into frequency bands?",
+    opts:["TDM","FDM","CDMA"],
+    correct:1 },
+
+  { q:"What does CRC stand for?",
+    opts:["Cyclic Redundancy Check","Central Routing Control","Common Resource Channel"],
+    correct:0 }
+];
+
+// DBMS bank (20 questions)
+const dbmsBank = [
+  { q:"What does DBMS stand for?",
+    opts:["Data Backup Management System","Database Management System","Data Binary Management System"],
+    correct:1 },
+  { q:"Which of the following is NOT a feature of DBMS?",
+    opts:["Data security","Backup and recovery","Manual data processing"],
+    correct:2 },
+  { q:"Which language is used to define database structure?",
+    opts:["DML","DDL","DCL"],
+    correct:1 },
+  { q:"Which command is used to retrieve data from a database?",
+    opts:["INSERT","SELECT","UPDATE"],
+    correct:1 },
+  { q:"Which type of DBMS stores data in the form of tables?",
+    opts:["NoSQL","RDBMS","File System"],
+    correct:1 },
+  { q:"Which DBMS command removes all records from a table permanently?",
+    opts:["DELETE","DROP","TRUNCATE"],
+    correct:2 },
+  { q:"Which of the following is a disadvantage of the File System?",
+    opts:["Data redundancy","Data sharing","Data security"],
+    correct:0 },
+  { q:"Which DBMS architecture has client, server, and database on the same system?",
+    opts:["1-Tier","2-Tier","3-Tier"],
+    correct:0 },
+  { q:"Which level of data abstraction shows only the required data to the user?",
+    opts:["Physical level","Logical level","View level"],
+    correct:2 },
+  { q:"Which key uniquely identifies a record in a table?",
+    opts:["Foreign key","Primary key","Composite key"],
+    correct:1 },
+  { q:"An attribute that can have multiple values is called:",
+    opts:["Composite attribute","Derived attribute","Multivalued attribute"],
+    correct:2 },
+  { q:"In ER diagrams, which symbol represents a relationship?",
+    opts:["Rectangle","Ellipse","Diamond"],
+    correct:2 },
+  { q:"Which ACID property ensures that committed transactions are saved permanently?",
+    opts:["Atomicity","Isolation","Durability"],
+    correct:2 },
+  { q:"Loss of important data while deleting a record is called:",
+    opts:["Insertion anomaly","Deletion anomaly","Update anomaly"],
+    correct:1 },
+  { q:"Which constraint ensures valid references between tables?",
+    opts:["Domain constraint","Key constraint","Referential integrity"],
+    correct:2 },
+  { q:"Which entity does NOT have its own primary key?",
+    opts:["Strong entity","Weak entity","Independent entity"],
+    correct:1 },
+  { q:"A double rectangle in ER diagram represents:",
+    opts:["Multivalued attribute","Weak entity","Derived attribute"],
+    correct:1 },
+  { q:"Which relationship allows many entities on both sides?",
+    opts:["One-to-One","One-to-Many","Many-to-Many"],
+    correct:2 },
+  { q:"NULL value in DBMS represents:",
+    opts:["Zero value","Missing or unknown value","Invalid value"],
+    correct:1 },
+  { q:"Which DBMS feature allows multiple users to access data at the same time?",
+    opts:["Data independence","Concurrency control","Data abstraction"],
+    correct:1 }
+];
+
+//DS bank(20 questions)
+
+const dsBank = [
+  { q:"What is a data structure?",
+    opts:["A programming language","A way to store and organize data","A computer hardware component"],
+    correct:1 },
+
+  { q:"Which data structure follows LIFO principle?",
+    opts:["Queue","Stack","Array"],
+    correct:1 },
+
+  { q:"Which data structure follows FIFO principle?",
+    opts:["Stack","Tree","Queue"],
+    correct:2 },
+
+  { q:"Which of the following is a linear data structure?",
+    opts:["Tree","Graph","Array"],
+    correct:2 },
+
+  { q:"Which operation is performed only at one end in a stack?",
+    opts:["Deletion","Insertion","Both insertion and deletion"],
+    correct:2 },
+
+  { q:"Which data structure uses nodes with data and pointers?",
+    opts:["Array","Linked List","Stack"],
+    correct:1 },
+
+  { q:"What is the time complexity of accessing an element in an array?",
+    opts:["O(n)","O(log n)","O(1)"],
+    correct:2 },
+
+  { q:"Which linked list allows traversal in both directions?",
+    opts:["Singly linked list","Doubly linked list","Circular linked list"],
+    correct:1 },
+
+  { q:"Which data structure is used for recursion?",
+    opts:["Queue","Stack","Heap"],
+    correct:1 },
+
+  { q:"Which traversal of binary tree gives sorted order for BST?",
+    opts:["Preorder","Inorder","Postorder"],
+    correct:1 },
+
+  { q:"What is the maximum number of children of a binary tree node?",
+    opts:["1","2","3"],
+    correct:1 },
+
+  { q:"Which data structure is used in Breadth First Search (BFS)?",
+    opts:["Stack","Queue","Array"],
+    correct:1 },
+
+  { q:"Which data structure is best for implementing priority queue?",
+    opts:["Stack","Heap","Linked List"],
+    correct:1 },
+
+  { q:"Which sorting algorithm has the best average-case time complexity?",
+    opts:["Bubble Sort","Insertion Sort","Quick Sort"],
+    correct:2 },
+
+  { q:"What is the worst-case time complexity of Binary Search?",
+    opts:["O(n)","O(log n)","O(1)"],
+    correct:1 },
+
+  { q:"Which graph traversal uses recursion?",
+    opts:["BFS","DFS","Dijkstra"],
+    correct:1 },
+
+  { q:"Which data structure is used to detect cycle in a graph?",
+    opts:["Stack","Queue","Disjoint Set"],
+    correct:2 },
+
+  { q:"Which hashing technique handles collisions by linking elements?",
+    opts:["Open addressing","Linear probing","Chaining"],
+    correct:2 },
+
+  { q:"What is the height of a balanced binary tree with n nodes?",
+    opts:["O(n)","O(log n)","O(n log n)"],
+    correct:1 },
+
+  { q:"Which traversal is used to delete a tree?",
+    opts:["Preorder","Inorder","Postorder"],
+    correct:2 }
+];
+
+
+// ML bank (20 questions from your message)
+const mlBank = [
+  { q:"What is Machine Learning?",
+    opts:["Programming computers manually","Enabling machines to learn from data","Designing hardware systems"],
+    correct:1 },
+  { q:"Which of the following is a type of Machine Learning?",
+    opts:["Supervised learning","Guided learning","Manual learning"],
+    correct:0 },
+  { q:"Which type of learning uses labeled data?",
+    opts:["Unsupervised learning","Reinforcement learning","Supervised learning"],
+    correct:2 },
+  { q:"Which algorithm is commonly used for classification?",
+    opts:["Linear Regression","Logistic Regression","K-Means"],
+    correct:1 },
+  { q:"Which programming language is most widely used in Machine Learning?",
+    opts:["Python","HTML","SQL"],
+    correct:0 },
+  { q:"Which algorithm is mainly used for clustering?",
+    opts:["K-Means","Decision Tree","Naive Bayes"],
+    correct:0 },
+  { q:"The main goal of supervised learning is to:",
+    opts:["Discover hidden patterns","Predict outputs using labeled data","Maximize reward"],
+    correct:1 },
+  { q:"Which metric is commonly used to evaluate classification models?",
+    opts:["Mean Squared Error","Accuracy","Variance"],
+    correct:1 },
+  { q:"Overfitting happens when a model:",
+    opts:["Performs well on unseen data","Learns training data too well","Has low training accuracy"],
+    correct:1 },
+  { q:"Which technique helps reduce overfitting?",
+    opts:["Regularization","Initialization","Sampling"],
+    correct:0 },
+  { q:"Which algorithm is based on Bayes’ Theorem?",
+    opts:["KNN","Naive Bayes","SVM"],
+    correct:1 },
+  { q:"Feature scaling is used to:",
+    opts:["Remove irrelevant features","Standardize the range of features","Increase dataset size"],
+    correct:1 },
+  { q:"Which kernel functions are commonly used in SVM?",
+    opts:["Linear","Gaussian (RBF)","Both A and B"],
+    correct:2 },
+  { q:"Gradient Descent is used to:",
+    opts:["Increase the error","Minimize the loss function","Maximize accuracy directly"],
+    correct:1 },
+  { q:"Which learning approach uses reward and penalty?",
+    opts:["Supervised learning","Unsupervised learning","Reinforcement learning"],
+    correct:2 },
+  { q:"KNN mainly suffers from which problem?",
+    opts:["High bias","Curse of dimensionality","Underfitting"],
+    correct:1 },
+  { q:"What is the role of an activation function in neural networks?",
+    opts:["Add non-linearity","Remove neurons","Reduce dataset size"],
+    correct:0 },
+  { q:"Which loss function is used in linear regression?",
+    opts:["Cross-entropy loss","Mean Squared Error","Hinge loss"],
+    correct:1 },
+  { q:"PCA is mainly used for:",
+    opts:["Classification","Feature extraction","Dimensionality reduction"],
+    correct:2 },
+  { q:"Which model is best suited for sequential data?",
+    opts:["CNN","RNN","Decision Tree"],
+    correct:1 }
+];
+
+// Map subject name -> question bank
+const subjectQuestionBanks = {
+    "Mathematics": mathBank,
+    "Maths": mathBank,
+    "DBMS": dbmsBank,
+    "ML": mlBank,
+    "Machine Learning": mlBank,
+    "CN": cnBank,
+    "Computer Networks": cnBank,
+    "DS": dsBank,
+    "Data Structures": dsBank
+};
+
+// helper: choose bank for current weakness
+function getBankForSubject(subject) {
+    return subjectQuestionBanks[subject] || mathBank;
+}
+
+let reflectionDone = false;
+let mcqCorrect = [];
+let testScore = null;
+
+// ---------- LOAD STUDENT ----------
+window.onload = function() {
+    if (!currentUser) {
+        alert("No user specified. Go back to login.");
+        window.location.href = "student.html";
+        return;
+    }
+
+    fetch("http://127.0.0.1:3000/students")
+      .then(res => res.json())
+      .then(data => {
+          const s = data.find(st => st.username === currentUser);
+          if (!s) {
+              alert("User not found. Please login again.");
+              window.location.href = "student.html";
+              return;
+          }
+          currentWeakness = s.weakness || "your weak subject";
+
+          document.getElementById("sUser").innerText  = s.username || "";
+          document.getElementById("sEmail").innerText = s.email || "";
+          document.getElementById("sWeak").innerText  = s.weakness || "";
+          document.getElementById("sVideo").innerHTML = s.video_link
+              ? `<a class="btn-link" href="${s.video_link}" target="_blank">Open Video</a>`
+              : "Not assigned yet";
+          document.getElementById("sPdf").innerHTML   = s.pdf_link
+              ? `<a class="btn-link" href="${s.pdf_link}" target="_blank">Open PDF</a>`
+              : "Not assigned yet";
+          document.getElementById("sCompleted").innerText = s.completed || "No";
+          document.getElementById("statusPill").innerText = s.completed === "Yes" ? "Completed" : "Active";
+
+          if (s.completed === "Yes") {
+              document.getElementById("testSection").style.display = "block";
+              generateReflectionQuestions();
+          }
+      })
+      .catch(err => {
+          console.error(err);
+          alert("Error loading student data.");
+      });
+};
+
+// ---------- MARK COMPLETED ----------
+function markCompleted() {
+    if (!currentUser) {
+        alert("Login first");
+        return;
+    }
+
+    fetch("http://127.0.0.1:3000/completePath", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: currentUser })
+    })
+    .then(res => res.json())
+    .then(r => {
+        alert(r.msg);
+        document.getElementById("sCompleted").innerText = "Yes";
+        document.getElementById("statusPill").innerText = "Completed";
+        document.getElementById("testSection").style.display = "block";
+        generateReflectionQuestions();
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Error saving completion");
+    });
+}
+
+// ---------- REFLECTION ----------
+function generateReflectionQuestions() {
+    const container = document.getElementById("questionsContainer");
+    container.innerHTML = "";
+    reflectionDone = false;
+
+    const topic = currentWeakness || "your weak subject";
+
+    improvementTemplates.forEach((makeQ, idx) => {
+        const item = makeQ(topic);
+        const div = document.createElement("div");
+        div.className = "question";
+
+        let html = `<div><strong>Q${idx+1}. ${item.q}</strong></div>`;
+        html += `<div class="options-grid">`;
+        item.opts.forEach(opt => {
+            html += `
+              <div class="option-radio">
+                <input type="radio" name="q${idx}" value="${opt}">
+              </div>
+              <div class="option-text">${opt}</div>`;
+        });
+        html += `</div>`;
+
+        div.innerHTML = html;
+        container.appendChild(div);
+    });
+}
+
+function submitReflection() {
+    for (let i = 0; i < improvementTemplates.length; i++) {
+        const els = document.getElementsByName("q" + i);
+        let answered = false;
+        for (let r of els) {
+            if (r.checked) { answered = true; break; }
+        }
+        if (!answered) {
+            alert("Please answer all reflection questions before saving.");
+            return;
+        }
+    }
+    reflectionDone = true;
+    alert("Reflection saved. Now choose whether to take a test.");
+    document.getElementById("testChoiceSection").style.display = "block";
+}
+
+// ---------- TEST YES/NO ----------
+function startTest() {
+    if (!reflectionDone) {
+        alert("Please save reflection answers first.");
+        return;
+    }
+    document.getElementById("testChoiceSection").style.display = "none";
+    document.getElementById("mcqTestSection").style.display = "block";
+    buildMcqQuestions();
+}
+
+function skipTest() {
+    document.getElementById("testChoiceSection").style.display = "none";
+
+    fetch("http://127.0.0.1:3000/skipTest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: currentUser })
+    })
+    .then(res => res.json())
+    .then(r => {
+        alert("You chose not to take the test now. This is recorded for the teacher.");
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Could not record your choice.");
+    });
+}
+
+// ---------- MCQ: pick 10 from subject bank ----------
+function buildMcqQuestions() {
+    const container = document.getElementById("mcqContainer");
+    container.innerHTML = "";
+    mcqCorrect = [];
+    testScore = null;
+
+    const bank = getBankForSubject(currentWeakness);
+    const used = new Set();
+    const chosen = [];
+
+    while (chosen.length < 10 && used.size < bank.length) {
+        const idx = Math.floor(Math.random() * bank.length);
+        if (used.has(idx)) continue;
+        used.add(idx);
+        chosen.push(bank[idx]);
+    }
+
+    chosen.forEach((item, localIndex) => {
+        mcqCorrect[localIndex] = item.correct;
+        const div = document.createElement("div");
+        div.className = "question";
+
+        let html = `<div><strong>Q${localIndex+1}. ${item.q}</strong></div>`;
+        html += `<div class="options-grid">`;
+        item.opts.forEach((opt, i) => {
+            html += `
+              <div class="option-radio">
+                <input type="radio" name="t${localIndex}" value="${i}">
+              </div>
+              <div class="option-text">${opt}</div>`;
+        });
+        html += `</div>`;
+
+        div.innerHTML = html;
+        container.appendChild(div);
+    });
+}
+
+function submitMcqTest() {
+    let score = 0;
+    const total = mcqCorrect.length;
+
+    for (let i = 0; i < total; i++) {
+        const els = document.getElementsByName("t" + i);
+        let selected = -1;
+        for (let r of els) {
+            if (r.checked) { selected = parseInt(r.value); break; }
+        }
+        if (selected === -1) {
+            alert("Please answer all test questions.");
+            return;
+        }
+        if (selected === mcqCorrect[i]) score++;
+    }
+    testScore = score;
+    document.getElementById("testScoreText").innerText = `${score} / ${total}`;
+    document.getElementById("testResultsSection").style.display = "block";
+}
+
+// ---------- FINAL FEEDBACK TO BACKEND ----------
+function submitFinalFeedback() {
+    if (!currentUser) {
+        alert("Login first");
+        return;
+    }
+    if (testScore === null) {
+        alert("Please submit your test first.");
+        return;
+    }
+
+    const improvement = document.getElementById("improvement").value;
+    const feedback = document.getElementById("feedback").value.trim();
+    if (!feedback) {
+        alert("Please write your feedback.");
+        return;
+    }
+
+    fetch("http://127.0.0.1:3000/submitTest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            username: currentUser,
+            score: testScore,
+            improvement,
+            feedback
+        })
+    })
+    .then(res => res.json())
+    .then(r => {
+        alert(r.msg);
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Error saving test & feedback");
+    });
+}
+</script>
+</body>
+</html>
