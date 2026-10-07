@@ -2,11 +2,14 @@
  It generates personalized learning paths, tracks quiz performance, collects feedback, and allows admins to reassign learning paths based on student progress. Includes real-time analytics to help improve learning outcomes.
 
  📋 Overview
+ 
 This AI-powered educational platform provides personalized learning experiences by analyzing student information and generating customized learning paths. The system tracks student progress through quizzes, collects feedback, and allows administrators to manage learning content and monitor performance in real-time.
 
 
-🎯 Key Features
+🎯Key Features
+
 For Students
+
 Simple Registration: One-time sign-up with basic details
 
 Personalized Learning Path: AI-generated content based on student profile
@@ -18,7 +21,9 @@ Progress Tracking: View completed lessons and quiz scores
 Feedback System: Submit feedback for continuous improvement
 
 
-For Administrators
+
+**For Administrators**
+
 Student Management: View all registered students
 
 Performance Analytics: Track quiz scores and completion rates
@@ -30,11 +35,16 @@ Feedback Monitoring: Review student feedback and suggestions
 Real-time Dashboard: Monitor overall platform activity
 
 
-Tech Stack
+
+**Tech Stack**
+
 Frontend: HTML5, CSS3, JavaScript
+
 Backend: Node.js with Express.js
 
+
 **Quick Start**
+
 Clone the repository
 
 bash
@@ -80,40 +90,36 @@ Review student feedback
 Reassign or modify learning paths as needed
 
 
+
+
 📁 Project Structure
-AI-Supported-Personalized-Learning-Platform/
-├── Student.html              # Student registration & learning portal
-├── Admin.html                # Admin dashboard
-├── server.js                 # Backend server (Node.js + Express)
-├── data.xlsx                 # Student data storage (Excel-based)
-├── package.json              # Project dependencies
-├── README.md                 # Documentation
-└── screenshots/              # Project screenshots
-    ├── registration.png
-    ├── dashboard.png
-    ├── quiz.png
-    └── admin-panel.png
+
+<img width="793" height="602" alt="image" src="https://github.com/user-attachments/assets/251a4181-9a1f-46ab-8920-bafb8a0b1ecb" />
+
 
 
 🖼️ Screenshots
-Home Page
-<img width="960" height="507" alt="HOME PAGE" src="https://github.com/user-attachments/assets/bba52d75-6891-4e58-9f6b-fc446df196e0" />
 
+Home Page
+
+<img width="960" height="507" alt="HOME PAGE" src="https://github.com/user-attachments/assets/bba52d75-6891-4e58-9f6b-fc446df196e0" />
 
 
 Student Registration Page
 
-
-Personalized Learning Dashboard
-
-
-Quiz Interface
+<img width="1164" height="618" alt="image" src="https://github.com/user-attachments/assets/6fa45e58-aa61-4ba4-a3da-fa84ac4cd4f5" />
 
 
 Admin Dashboard
 
+<img width="1188" height="620" alt="image" src="https://github.com/user-attachments/assets/6f583c38-d409-43d0-a3d9-24740022f590" />
+
+<img width="1217" height="620" alt="image" src="https://github.com/user-attachments/assets/1d1dbb3f-8322-4f2a-9ed2-16ba0e28470e" />
+
+
 
 🔒 Security Features
+
 Input validation on registration forms
 
 Secure data handling
